@@ -1,7 +1,3 @@
-// The Basic Image Container - Region-Of-Interest
-// Uitleg: http://docs.opencv.org/doc/tutorials/core/mat_the_basic_image_container/mat_the_basic_image_container.html
-// Jan Oostindie, dd 22-1-2015
-
 #include "includes.h"
 
 int opg2_1(int argc, char** argv)
