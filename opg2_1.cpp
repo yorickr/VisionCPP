@@ -2,17 +2,7 @@
 // Uitleg: http://docs.opencv.org/doc/tutorials/core/mat_the_basic_image_container/mat_the_basic_image_container.html
 // Jan Oostindie, dd 22-1-2015
 
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv/cv.h>
-#include <opencv2/imgproc/imgproc.hpp>
-
-#include <iostream>
-#include <string>
-
-using namespace cv;
-using namespace std;
+#include "includes.h"
 
 int opg2_1(int argc, char** argv)
 {
