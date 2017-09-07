@@ -11,12 +11,15 @@ from ronin.utils.paths import glob
 def debug_hook(executor):
     executor.standard('c++11')
     with current_context() as ctx:
-        if ctx.get('build.debug', False):
-            executor.enable_debug()
+        print(ctx.get('build.debug'))
+        if ctx.get('build.debug') == False:
             executor.optimize('2') # make sure we use '2' instead of the default 'g', as Apple's clang doesn't support this.
+        else:
+            executor.enable_debug()
+            executor.optimize('0')
 
 with new_context() as ctx:
-    project = Project('opencv debug')
+    project = Project('VisionCPP')
     extensions = [Package('OpenCV')]
 
     configure_gcc(gcc_command='g++',
