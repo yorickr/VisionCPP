@@ -45,7 +45,7 @@ int opg2_2(int argc, char** argv)
 	cout << "Het aantal kanalen per pixel is: " << channels << endl;
 
 	// Controleren of de afbeelding een grijswaarde beeld is.
-	if (!channels == 1) {
+	if ((!channels) == 1) {
 		cout << "NB Dit is geen grijswaarde beeld" << endl;
 		cout << "Het programma is hier niet op voorbereid en wordt daarom gestopt.";
 		return -1;
@@ -68,7 +68,7 @@ int opg2_2(int argc, char** argv)
 	string istr = dummy.substr(0, dummy.find(','));
 	string jstr = dummy.replace(0, dummy.find(',') + 1, "");
 
-	// i en j deel omzetten in een integer 
+	// i en j deel omzetten in een integer
 	int i, j;
 	i = atoi(istr.c_str());
 	j = atoi(jstr.c_str());

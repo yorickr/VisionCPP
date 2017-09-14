@@ -28,7 +28,7 @@ with new_context() as ctx:
     compile = Phase()
     compile.executor = GccCompile()
     compile.extensions += extensions
-    compile.inputs = glob('main.cpp')
+    compile.inputs = glob('*.cpp')
     compile.executor.hooks.append(debug_hook)
 
     link = Phase()
