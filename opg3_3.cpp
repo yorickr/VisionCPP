@@ -13,13 +13,17 @@ int opg3_3(int argc, char* argv[])
 		return -1;
 	}
 
-	// Breedte en hooogte van de frames die de camera genereert ophalen.
+	string windowName = "Opgave 3_3";
+
+	// Breedte en hoogte van de frames die de camera genereert ophalen.
+	cap.set(CV_CAP_PROP_FPS, 10);
 	double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH);
 	double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 	cout << "Frame size : " << dWidth << " x " << dHeight << endl;
+	cout << "FPS: " << cap.get(CV_CAP_PROP_FPS) << endl;
 
 	// Window maken waarin de beelden "live" getoond worden
-	namedWindow("MyVideo", CV_WINDOW_AUTOSIZE);
+	namedWindow(windowName, CV_WINDOW_AUTOSIZE);
 
 	// Continue loop waarin een beeld wordt opgehaald en wordt getoond in het window
 	Mat frame;
@@ -41,8 +45,28 @@ int opg3_3(int argc, char* argv[])
 		Mat gray_image;
 		cvtColor(frame, gray_image, CV_BGR2GRAY);
 
+		// Filter ruis weg
+		Mat result;
+		Mat kernel = (Mat_<double>(5,5) << 2, 4, 5, 4, 2, 4, 9, 12, 9, 4, 5, 12, 15, 12, 5, 4, 9, 12, 9, 4, 2, 4, 5, 4, 2);
+		filter2D(gray_image, result, -1, kernel * (1.0f/115), Point(-1, -1), 0, BORDER_REPLICATE);
+
+
 		// Het tonen van grijswaarde beeld
-		imshow("MyVideo", gray_image);
+		imshow(windowName, gray_image);
+
+		Mat tresholdImage;
+		Mat binaryImage;
+		const int tresh_value = 100;
+		threshold(result, tresholdImage, tresh_value, 200, THRESH_BINARY_INV);
+		threshold(result, binaryImage, tresh_value, 1, THRESH_BINARY_INV);
+
+		imshow("Treshold image", tresholdImage);
+
+		Mat binary16S;
+		binaryImage.convertTo(binary16S, CV_16S);
+		Mat labeledImage;
+		cout << "Total number of BLOBs " << labelBLOBs(binary16S, labeledImage) << endl;
+		show16SImageStretch(labeledImage, "Blob image");
 
 		//  Wacht 30 ms op ESC-toets. Als ESC-toets is ingedrukt verlaat dan de loop
 		if (waitKey(1) == 27)

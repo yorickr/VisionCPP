@@ -1,9 +1,7 @@
 // Functionaliteit: Test- en demoprogramma voor labeling functies
 //                  uit de library avansvisionlib.
 // Jan Oostindie, dd 17-3-2016
-#include "includes.h"
-
-#include "blobdetectionavans.h"
+#include "test_blob_lib.h"
 
 int test_blob_lib(int argc, char *argv[])
 {

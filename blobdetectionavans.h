@@ -6,6 +6,9 @@
 // Note: Students of Avans are free to use code in projects and for own vision competence development. Others may ask permission to use it by means
 // of sending an email to Jan Oostindie, i.e. jac.oostindie@avans.nl
 
+#ifndef BLOBDETECTION_AVANS_H
+#define BLOBDETECTION_AVANS_H
+
 #include "includes.h"
 
 
@@ -70,3 +73,5 @@ Mat getRowImage(Mat m, int rowNr);
 // pre: 0 < colNr < m.cols
 // return: <result matrix> contains the selected column
 Mat getColImage(Mat m, int colNr);
+
+#endif
