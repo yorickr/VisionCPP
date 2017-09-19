@@ -3,6 +3,7 @@
 #include "opg2_3.h"
 #include "opg2_4.h"
 #include "opg3_3.h"
+#include "opg3_4.h"
 #include "opg3_6.h"
 #include "test_blob_lib.h"
 
@@ -14,5 +15,6 @@ int main (int argc, char** argv) {
     // return opg2_4(argc, argv);
     // return test_blob_lib(argc, argv);
     // return opg3_3(argc, argv);
-    return opg3_6(argc, argv);
+    return opg3_4(argc, argv);
+    // return opg3_6(argc, argv);
 }
