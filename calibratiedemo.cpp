@@ -142,6 +142,20 @@ int opg4_1(int argc, char **argv) {
 
 		imshow("original", image);
 		imshow("undistorted", imageUndistorted);
-		waitKey(1);
+
+		if (waitKey(1) == 27) break;
 	}
+
+	/***** saven van de callibratie data *****/
+
+	// YML-file aanmaken
+	FileStorage fs("C:\\School\\ueyecallib.yml", FileStorage::WRITE);
+
+	// wegschrijven van callibratie data naar de YML-file 
+	fs << "intrinsic" << intrinsic << "distCoeffs" << distCoeffs;
+
+	// de file afsluiten
+	fs.release();
+
+	return 1;
 }
