@@ -5,8 +5,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv/cv.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/videoio.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <stdint.h>
 
