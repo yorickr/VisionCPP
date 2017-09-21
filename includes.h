@@ -12,6 +12,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
+
 #include <stdint.h>
 
 #include <math.h>
@@ -21,6 +23,7 @@
 using namespace cv;
 using namespace std;
 
-//typedef int16_t _int16; // want avans gebruikt types die niet in stdint.h zijn gedefined..
-
+#ifdef __APPLE__
+typedef int16_t _int16; // want avans gebruikt types die niet in stdint.h zijn gedefined..
+#endif
 #endif
