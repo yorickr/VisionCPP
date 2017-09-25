@@ -1,36 +1,119 @@
 #include "opg4_2.h"
 
-bool sortFunc(tuple<int, int, int, vector<Point>> left, tuple<int, int, int, vector<Point>> right) {
+bool sortFunc(tuple<int, int, int, vector<Point>, Point, Point> left, tuple<int, int, int, vector<Point>, Point, Point> right) {
 	return get<1>(left) < get<1>(right);
 }
 
-void findTopAndBot (const vector<vector<Point>> contours, vector<vector<Point>> &inputVector) {
-	vector<tuple<int, int, int, vector<Point>>> temp;
+// Find max and min values for a given vector of Point, returns tuple where 1 is min, 2 is max, 3 is the vector<Point> set
+vector<tuple<int, int, int, vector<Point>, Point, Point>> findMaxAndMin(const vector<vector<Point>> &contours, bool y = false) {
+	vector<tuple<int, int, int, vector<Point>, Point, Point>> temp;
 	for(int i = 0; i != contours.size(); i++) {
-		// find max X and min X
-		int minX = numeric_limits<int>::max(), maxX = numeric_limits<int>::min();
+		// find max and min
+		int min = numeric_limits<int>::max(), max = numeric_limits<int>::min();
+		Point pMin, pMax;
 		for (auto const& point : contours[i]) {
-			int x = point.x;
-			if (x < minX) {
-				minX = x;
+			int value;
+			if (y) {
+				value = point.y;
+			} else {
+				value = point.x;
 			}
-			if (x > maxX) {
-				maxX = x;
+			if (value < min) {
+				min = value;
+				pMin = point;
+			}
+			if (value > max) {
+				max = value;
+				pMax = point;
 			}
 		}
-		cout << "Min X is " << minX << endl;
-		cout << "Max X is " << maxX << endl;
-		cout << "I is " << i << endl;
-		tuple<int, int, int, vector<Point>> tup = make_tuple(i, minX, maxX, contours[i]);
+		// cout << "Min is " << min << endl;
+		// cout << "Max is " << max << endl;
+		// cout << "I is " << i << endl;
+		tuple<int, int, int, vector<Point>, Point, Point> tup = make_tuple(i, min, max, contours[i], pMin, pMax);
 		temp.push_back(tup);
 	}
+	return temp;
+}
+
+void findTopAndBot(const vector<vector<Point>> contours, vector<vector<Point>> &inputVector) {
+	vector<tuple<int, int, int, vector<Point>, Point, Point>> temp = findMaxAndMin(contours, true);
 	sort(temp.begin(), temp.end(), sortFunc);
 	inputVector.push_back(get<3>(temp.front()));
 	inputVector.push_back(get<3>(temp.back()));
 
 }
 
-void calculatePixelToUnitRatio(const vector<Point> &vec) {
+float calculatePixelToUnitRatio(const vector<Point> &vec, const Mat &img) {
+	vector<vector<Point>> temp;
+	temp.push_back(vec);
+	// find max and min for x values to find the left and right side of the line
+	vector<tuple<int, int, int, vector<Point>, Point, Point>> tmp = findMaxAndMin(temp);
+	// find the lowest y value
+	vector<tuple<int, int, int, vector<Point>, Point, Point>> tmp2 = findMaxAndMin(temp, true);
+	tuple<int, int, int, vector<Point>, Point, Point> element = tmp.at(0);
+	tuple<int, int, int, vector<Point>, Point, Point> element2 = tmp2.at(0);
+	// cout << "Min " << get<1>(element) << endl;
+	// cout << "Max " << get<2>(element) << endl;
+	Point pMin, pMax, pMin2, pMax2;
+	pMin = get<4>(element);
+	pMax = get<5>(element);
+	pMin2 = get<4>(element2);
+	pMax2 = get<5>(element2);
+	// cout << "MinPoint " << pMin << endl;
+	// cout << "MaxPoint " << pMax << endl;
+	// cout << "MinPoint2 " << pMin2 << endl;
+	// cout << "MaxPoint2 " << pMax2 << endl;
+
+	float dis = norm(pMin - pMin2); // in pixels
+	float realDistance = 5.7f;
+	float disPerPixel = realDistance/dis;
+	cout << "Distance " << dis << endl;
+	cout << "DistancePerPixel " << disPerPixel << endl;
+
+	int thickness = 2;
+	int lineType = 8;
+	line( img,
+		pMin,
+		pMax,
+		Scalar( 255, 255, 255 ),
+		thickness,
+		lineType );
+	line( img,
+		pMin2,
+		pMax2,
+		Scalar( 255, 255, 255 ),
+		thickness,
+		lineType );
+	line( img,
+		pMin,
+		pMin2,
+		Scalar( 255, 255, 255 ),
+		thickness,
+		lineType );
+	return disPerPixel;
+}
+
+void calculateActualSizeOfRoundObject(const vector<Point> &obj, float disPerPixel, Mat &img) {
+	vector<vector<Point>> temp;
+	temp.push_back(obj);
+	// find max and min for x values to find the left and right side of the line
+	vector<tuple<int, int, int, vector<Point>, Point, Point>> tmp = findMaxAndMin(temp);
+	tuple<int, int, int, vector<Point>, Point, Point> element = tmp.at(0);
+	Point pMin, pMax;
+	pMin = get<4>(element);
+	pMax = get<5>(element);
+
+	cout << "The size of the round object is " << norm(pMin - pMax)*disPerPixel << " CM" << endl;
+
+	int thickness = 2;
+	int lineType = 8;
+	line( img,
+		pMin,
+		pMax,
+		Scalar( 0, 255, 0 ),
+		thickness,
+		lineType );
 
 }
 
@@ -82,18 +165,19 @@ void calculateSizeOfRoundObject(Mat frame) {
 		// imshow("Contours", drawing);
 	}
 	// imshow("Contours", drawing);
-	vector<vector<Point>> vec; // front is lowest, back is highest
+	vector<vector<Point>> vec; // front is highest, back is lowest
 	findTopAndBot(contours, vec);
-	cout << "Lowest " << contourArea(vec.front()) << endl;
-	cout << "Highest " << contourArea(vec.back()) << endl;
+	// cout << "Highest " << contourArea(vec.front()) << endl;
+	// cout << "Lowest " << contourArea(vec.back()) << endl;
 	drawing = Mat::zeros(canny_output.size(), CV_8UC3);
 	for (vector<int>::size_type i = 0; i != vec.size(); i++) {
 		Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 		drawContours( drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point() );
 	}
+	float disPerPixel = calculatePixelToUnitRatio(vec.back(), drawing);
+	calculateActualSizeOfRoundObject(vec.front(), disPerPixel, drawing);
 	imshow("Contours 2", drawing);
 
-	
 }
 
 int opg4_2(int argc, char** argv) {
