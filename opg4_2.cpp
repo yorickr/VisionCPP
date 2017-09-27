@@ -66,7 +66,7 @@ float calculatePixelToUnitRatio(const vector<Point> &vec, const Mat &img) {
 	// cout << "MaxPoint2 " << pMax2 << endl;
 
 	float dis = norm(pMin - pMin2); // in pixels
-	float realDistance = 5.7f;
+	float realDistance = 5.6f;
 	float disPerPixel = realDistance/dis;
 	cout << "Distance " << dis << endl;
 	cout << "DistancePerPixel " << disPerPixel << endl;
@@ -181,73 +181,73 @@ void calculateSizeOfRoundObject(Mat frame) {
 }
 
 int opg4_2(int argc, char** argv) {
-	// // YML-file met callibratie data openen
-	// FileStorage fs("C:\\School\\ueyecallib.yml", FileStorage::READ);
+	 // YML-file met callibratie data openen
+	 FileStorage fs("C:\\School\\ueyecallib.yml", FileStorage::READ);
+	
+	 // callibratie data ophalen
+	 Mat intrinsic, distCoeffs;
+	 fs["intrinsic"] >> intrinsic;
+	 fs["distCoeffs"] >> distCoeffs;
+	
+	 // callibratie matrices tonen op het scherm
+	 cout << "intrinsic matrix: " << intrinsic << endl;
+	 cout << "distortion coeffs: " << distCoeffs << endl;
+	
+	 // sluiten van de YML-file
+	 fs.release();
+	
+	 VideoCapture cap = VideoCapture(1);
 	//
-	// // callibratie data ophalen
-	// Mat intrinsic, distCoeffs;
-	// fs["intrinsic"] >> intrinsic;
-	// fs["distCoeffs"] >> distCoeffs;
-	//
-	// // callibratie matrices tonen op het scherm
-	// cout << "intrinsic matrix: " << intrinsic << endl;
-	// cout << "distortion coeffs: " << distCoeffs << endl;
-	//
-	// // sluiten van de YML-file
-	// fs.release();
-	//
-	// VideoCapture cap = VideoCapture(1);
-	//
-	// if (!cap.isOpened())
-	// {
-	// 	cout << "Cannot open the video cam" << endl;
-	// 	return -1;
-	// }
-	//
-	// double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH);
-	// double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-	// cout << "Frame size : " << dWidth << " x " << dHeight << endl;
-	//
-	// Mat frame, frameUndistorted;
-	// int count = 0;
-	//
-	// while (1) {
-	// 	// Lees een nieuw frame
-	// 	bool bSuccess = cap.read(frame);
-	//
-	// 	// Controlleer of het frame goed gelezen is.
-	// 	if (!bSuccess)
-	// 	{
-	// 		cout << "Cannot read a frame from video stream" << endl;
-	// 		break;
-	// 	}
-	// 	/*cap >> frame;*/
-	// 	undistort(frame, frameUndistorted, intrinsic, distCoeffs);
-	// 	if (count == 0) {
-	// 		imwrite("C:\\School\\frame.PNG", frameUndistorted);
-	// 		count++;
-	// 	}
-	// 	imshow("Original", frameUndistorted);
-	//
-	// 	calculateSizeOfRoundObject(frameUndistorted);
-	//
-	// 	//  Wacht 30 ms op ESC-toets. Als ESC-toets is ingedrukt verlaat dan de loop
-	// 	if (waitKey(1) == 27)
-	// 	{
-	// 		cout << "esc key is pressed by user" << endl;
-	// 		break;
-	// 	}
-	// }
-	Mat frame;
-	frame = imread("./images/frame.png", CV_LOAD_IMAGE_COLOR);
-	// Controleer of alles goed is gegaan
-	if (!frame.data)
-	{
-		cout << "Could not open or find the image" << std::endl;
-		return -1;
-	}
+	 if (!cap.isOpened())
+	 {
+	 	cout << "Cannot open the video cam" << endl;
+	 	return -1;
+	 }
+	
+	 double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+	 double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+	 cout << "Frame size : " << dWidth << " x " << dHeight << endl;
+	
+	 Mat frame, frameUndistorted;
+	 //int count = 0;
+	
+	 while (1) {
+	 	// Lees een nieuw frame
+	 	bool bSuccess = cap.read(frame);
+	
+	 	// Controlleer of het frame goed gelezen is.
+	 	if (!bSuccess)
+	 	{
+	 		cout << "Cannot read a frame from video stream" << endl;
+	 		break;
+	 	}
+	 	/*cap >> frame;*/
+	 	undistort(frame, frameUndistorted, intrinsic, distCoeffs);
+	 	/*if (count == 0) {
+	 		imwrite("C:\\School\\frame.PNG", frameUndistorted);
+	 		count++;
+	 	}*/
+	 	imshow("Original", frameUndistorted);
+	
+	 	calculateSizeOfRoundObject(frameUndistorted);
+	
+	 	//  Wacht 30 ms op ESC-toets. Als ESC-toets is ingedrukt verlaat dan de loop
+	 	if (waitKey(1) == 27)
+	 	{
+	 		cout << "esc key is pressed by user" << endl;
+	 		break;
+	 	}
+	 }
+	//Mat frame;
+	//frame = imread("./images/frame.png", CV_LOAD_IMAGE_COLOR);
+	//// Controleer of alles goed is gegaan
+	//if (!frame.data)
+	//{
+	//	cout << "Could not open or find the image" << std::endl;
+	//	return -1;
+	//}
 
-	calculateSizeOfRoundObject(frame);
+	//calculateSizeOfRoundObject(frame);
 
 	waitKey(0);
 
