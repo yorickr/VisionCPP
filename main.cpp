@@ -7,6 +7,7 @@
 #include "opg3_6.h"
 #include "opg4_2.h"
 #include "opg5_1.h"
+#include "opg5_2.h"
 
 #include "test_blob_lib.h"
 #include "calibratiedemo.h"
@@ -23,5 +24,6 @@ int main(int argc, char** argv) {
 	// return opg3_6(argc, argv);
 	// return opg4_1(argc, argv);
 	// return opg4_2(argc, argv);
-	return opg5_1(argc, argv);
+	// return opg5_1(argc, argv);
+	return opg5_2(argc, argv);
 }

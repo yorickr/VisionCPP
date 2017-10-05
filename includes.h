@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
+#include <map>
 
 #include <stdint.h>
 
