@@ -1,10 +1,5 @@
-#include <iostream>
-
-using namespace std;
-
+#include "vcpp1.h"
 
 int main(int argc, char **argv) {
-    cout << "Hello, this is our main function" << endl;
-
-    return 0;
+    return vcpp1_main(argc, argv);
 }
