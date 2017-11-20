@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from ronin.cli import cli
 from ronin.contexts import new_context, current_context
@@ -18,9 +18,9 @@ def debug_hook(executor):
             executor.enable_debug()
             executor.optimize('0')
 
-with new_context() as ctx:
-    project = Project('VisionCPP')
-    extensions = [Package('OpenCV')]
+def generate_project(project_path, project_name):
+    project = Project(project_name)
+    extensions = [Package('opencv')]
 
     configure_gcc(gcc_command='g++',
                   ccache=False)
@@ -28,7 +28,7 @@ with new_context() as ctx:
     compile = Phase()
     compile.executor = GccCompile()
     compile.extensions += extensions
-    compile.inputs = glob('*.cpp')
+    compile.inputs = glob(project_path + '*.cpp')
     compile.executor.hooks.append(debug_hook)
 
     link = Phase()
@@ -42,5 +42,16 @@ with new_context() as ctx:
 
     project.phases['link'] = link
     project.phases['compile'] = compile
+    return project
 
-    cli(project)
+with new_context() as ctx:
+    project_version = int(ctx.get('project.version'))
+    print("Running project version " + str(project_version))
+    if project_version is 1:
+        p1 = generate_project('./inleiding-vision-cpp/','VisionCPP-1')
+        cli(p1)
+    elif project_version is 2:
+        p2 = generate_project('./vision-cpp-gevorderden/','VisionCPP-2')
+        cli(p2)
+    else:
+        print("No project version specified")

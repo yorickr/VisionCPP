@@ -24,7 +24,7 @@
 using namespace cv;
 using namespace std;
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__linux__)
 typedef int16_t _int16; // want avans gebruikt types die niet in stdint.h zijn gedefined..
 #endif
 #endif
