@@ -1,7 +1,7 @@
 #ifndef MOOREBOUNDARYTRACKING
 #define MOOREBOUNDARYTRACKING
 
-#include "Inleiding Vision cpp\includes.h"
+#include "inleiding-vision-cpp\includes.h"
 
 int allContours(Mat binaryImage, vector< vector<Point> > & contourVecVec);
 
