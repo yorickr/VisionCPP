@@ -36,18 +36,8 @@ struct Directions {
 };
 
 Point firstNeighbour1pixel(Mat binaryImage, Point b0, Point c0, Point* c1);
-bool pixelInContour(vector<vector<Point>> &contours, Point pixel);
+bool pixelInOneOfTheContours(vector<vector<Point>> &contours, Point pixel);
 void getContour(Mat binaryImage, vector<Point> &contour, Point start);
-
-bool min_and_max_y(const cv::Point& lhs, const cv::Point& rhs)
-{
-	return lhs.y < rhs.y;
-}
-
-bool min_and_max_x(const cv::Point& lhs, const cv::Point& rhs)
-{
-	return lhs.x < rhs.x;
-}
 
 int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec)
 {
@@ -57,11 +47,10 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec)
 	for (int r = 0; r < binaryImage.rows; r++) {
 		for (int c = 0; c < binaryImage.cols; c++) {			
 			Point pixel(c, r);
-			bool pixelIs1 = binaryImage.at<__int16>(pixel) == 1;
-			bool pixelIsInAContour = pixelInContour(contourVecVec, pixel);
+			if (binaryImage.at<__int16>(pixel) != 1) continue;
 
 			//std::cout << "Pixel: (" << c << ", " << r << ") is 1: " << pixelIs1 << std::endl;
-			if (pixelIs1 && !pixelIsInAContour) {
+			if (!pixelInOneOfTheContours(contourVecVec, pixel)) {
 				vector<Point> contour;
 				getContour(binaryImage, contour, pixel);
 				if (contour.size() >= 4) {
@@ -78,27 +67,10 @@ int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec)
 	return (int)contourVecVec.size();
 }
 
-pair<Point, Point> getMinMaxY(const vector<Point> &contour) {
-	auto min_max_y_it = minmax_element(contour.begin(), contour.end(), min_and_max_y);
-	auto min_y = contour[min_max_y_it.first - contour.begin()];
-	auto max_y = contour[min_max_y_it.second - contour.begin()];
-	return pair<Point, Point>(min_y, max_y);
-}
+bool pixelInOneOfTheContours(vector<vector<Point>> &contours, Point pixel) {
+	if (contours.empty()) return false;
 
-pair<Point, Point> getMinMaxXAtSameY(const vector<Point> &contour, Point pixel) {
-	vector<Point> contourPointsAtSameY;
-	copy_if(contour.begin(), contour.end(), back_inserter(contourPointsAtSameY), [pixel](Point contourPixel) { return contourPixel.y == pixel.y; });
-
-	auto min_max_x_it = minmax_element(contourPointsAtSameY.begin(), contourPointsAtSameY.end(), min_and_max_x);
-	auto min_x = contourPointsAtSameY[min_max_x_it.first - contourPointsAtSameY.begin()];
-	auto max_x = contourPointsAtSameY[min_max_x_it.second - contourPointsAtSameY.begin()];
-	return pair<Point, Point>(min_x, max_x);
-}
-
-bool pixelInContour(vector<vector<Point>> &contours, Point pixel) {
-	/*if (contours.empty()) return false;
-
-	for (auto const &contour : contours) {
+	/*for (auto const &contour : contours) {
 		auto min_max_y = getMinMaxY(contour);
 		
 		if (pixel.y > min_max_y.first.y && pixel.y < min_max_y.second.y) {
@@ -114,6 +86,7 @@ bool pixelInContour(vector<vector<Point>> &contours, Point pixel) {
 	for (auto const &contour : contours) {
 		auto result = pointPolygonTest(contour, pixel, false);
 		if (result >= 0) return true;
+		//if (pixelInContour(contour, pixel)) return true;
 	}
 
 	return false;
@@ -165,10 +138,7 @@ void getContour(Mat binaryImage, vector<Point> &contour, Point start) {
 		std::cout << "Firstb1 is here again: " << (b1 == Firstb1) << std::endl;
 		std::cout << "So loop again" << !(b0 == Firstb0 && b1 == Firstb1) << std::endl;*/
 
-		if (!(b0 == Firstb0 && b1 == Firstb1))
-			/*if (!(find(contour.begin(), contour.end(), b1) != contour.end())) {
-				contour.push_back(b1);
-			}*/
+		if (!(b0 == Firstb0 && b1 == Firstb1))			
 			contour.push_back(b1);
 		else {
 			loop = false;
@@ -206,4 +176,40 @@ Point firstNeighbour1pixel(Mat binaryImage, Point b0, Point c0, Point* c1) {
 	}
 
 	return b0;
+}
+
+bool sortMinX(const Point p1, const Point p2) {
+	return p1.x < p2.x;
+}
+
+bool sortMinY(const Point p1, const Point p2) {
+	return p1.y < p2.y;
+}
+
+/*return true, if the pixel is in the contour*/
+bool pixelInContour(const vector<Point>& contour, Point pixel)
+{
+	//check if pixel lies on contour
+	if (find(contour.begin(), contour.end(), pixel) != contour.end()) {
+		return true;
+	}
+	/*
+	vector<Point>sameX, sameY;
+	copy_if(contour.begin(), contour.end(), back_inserter(sameX), [pixel](Point const& p) {return p.x == pixel.x; });
+	copy_if(contour.begin(), contour.end(), back_inserter(sameY), [pixel](Point const& p) {return p.y == pixel.y; });
+
+	sort(sameX.begin(), sameX.end(), [](const Point p1, const Point p2) {return p1.y < p2.y; });
+	sort(sameY.begin(), sameY.end(), [](const Point p1, const Point p2) {return p1.x < p2.x; });*/
+
+	bool inside = false;
+	for (int i = 0, j = contour.size() - 1; i < contour.size(); j = i++)
+	{
+		if ((contour[i].y > pixel.y) != (contour[j].y > pixel.y) &&
+			pixel.x < (contour[j].x - contour[i].x) * (pixel.y - contour[i].y) / (contour[j].y - contour[i].y) + contour[i].x)
+		{
+			inside = !inside;
+		}
+	}
+
+	return inside;
 }
