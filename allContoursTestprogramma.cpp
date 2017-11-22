@@ -76,8 +76,9 @@ int allContoursTestProgramma(int argc, char *argv[])
 	getline(cin, line);
 	for (int i = 0; i < contours.size(); i++) {
 		cout << "*** Contour " << i + 1 << " ***" << endl;
-		cout << "Press ENTER to continue....";
+		cout << "Press ENTER to continue or q to show contours...\n";
 		getline(cin, line);
+		if (line == "q") break;
 		for (int j = 0; j < contours[i].size(); j++) {
 			cout << "(" << contours[i][j].x << "," << contours[i][j].y << ")" << endl;
 		}		

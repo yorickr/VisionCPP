@@ -41,7 +41,7 @@ void getContour(Mat binaryImage, vector<Point> &contour, Point start);
 
 int allContours(Mat binaryImage, vector<vector<Point>>& contourVecVec)
 {
-	std::cout << "Rows:" << binaryImage.rows << ", Columns:" << binaryImage.cols << std::endl;
+	//std::cout << "Rows:" << binaryImage.rows << ", Columns:" << binaryImage.cols << std::endl;
 
 	vector<Point> allContourPoints;
 	for (int r = 0; r < binaryImage.rows; r++) {
@@ -84,9 +84,9 @@ bool pixelInOneOfTheContours(vector<vector<Point>> &contours, Point pixel) {
 	return false;*/
 
 	for (auto const &contour : contours) {
-		auto result = pointPolygonTest(contour, pixel, false);
-		if (result >= 0) return true;
-		//if (pixelInContour(contour, pixel)) return true;
+		/*auto result = pointPolygonTest(contour, pixel, false);
+		if (result >= 0) return true;*/
+		if (pixelInContour(contour, pixel)) return true;
 	}
 
 	return false;
@@ -166,6 +166,10 @@ Point firstNeighbour1pixel(Mat binaryImage, Point b0, Point c0, Point* c1) {
 
 		nextPosition = b0 + directions.clockWise[nextPointClockIndex];
 		//std::cout << "=> Next position: " << nextPosition << std::endl;
+
+		//check if next position is inside binaryimage
+		if (nextPosition.x < 0 || nextPosition.x >= binaryImage.cols || nextPosition.y < 0 || nextPosition.y >= binaryImage.rows) continue;
+
 		if (binaryImage.at<_int16>(nextPosition) == 1) {
 			Point preceding0(b0 + directions.clockWise[previousPointClockIndex]);
 			//std::cout << "Found next 1, so preceding 0 has position" << preceding0 << std::endl;
@@ -178,36 +182,35 @@ Point firstNeighbour1pixel(Mat binaryImage, Point b0, Point c0, Point* c1) {
 	return b0;
 }
 
-bool sortMinX(const Point p1, const Point p2) {
-	return p1.x < p2.x;
-}
-
-bool sortMinY(const Point p1, const Point p2) {
-	return p1.y < p2.y;
-}
-
-/*return true, if the pixel is in the contour*/
+/*
+return true, if the pixel is in the contour
+Use the ray-casting algorithm, to see if pixel is in the contour.
+*/
 bool pixelInContour(const vector<Point>& contour, Point pixel)
 {
 	//check if pixel lies on contour
 	if (find(contour.begin(), contour.end(), pixel) != contour.end()) {
 		return true;
 	}
-	/*
-	vector<Point>sameX, sameY;
-	copy_if(contour.begin(), contour.end(), back_inserter(sameX), [pixel](Point const& p) {return p.x == pixel.x; });
-	copy_if(contour.begin(), contour.end(), back_inserter(sameY), [pixel](Point const& p) {return p.y == pixel.y; });
-
-	sort(sameX.begin(), sameX.end(), [](const Point p1, const Point p2) {return p1.y < p2.y; });
-	sort(sameY.begin(), sameY.end(), [](const Point p1, const Point p2) {return p1.x < p2.x; });*/
-
+	
+	// if pixel never cross line, pixel is lies inside the contour
 	bool inside = false;
-	for (int i = 0, j = contour.size() - 1; i < contour.size(); j = i++)
-	{
-		if ((contour[i].y > pixel.y) != (contour[j].y > pixel.y) &&
-			pixel.x < (contour[j].x - contour[i].x) * (pixel.y - contour[i].y) / (contour[j].y - contour[i].y) + contour[i].x)
-		{
-			inside = !inside;
+	
+	for (int i = 0; i < contour.size(); ++i) {
+
+		//i is the first point and j is the next one.
+		int j = (i + 1) % contour.size();
+
+		Point first = contour[i];
+		Point second = contour[j];
+		
+		//check if the pixel crosses the horizontale line between the y coordinates of first and second point.
+		if ((first.y <= pixel.y) && (second.y > pixel.y) || (second.y <= pixel.y) && (first.y > pixel.y)) {
+			//cout << "First: " << first << ", Second: " << second << ", Pixel: " << pixel << endl;
+			double cross = (second.x - first.x) * (pixel.y - first.y) / (second.y - first.y) + first.x;
+
+			if (cross < pixel.x)
+				inside = !inside;
 		}
 	}
 
