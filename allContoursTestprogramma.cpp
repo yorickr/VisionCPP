@@ -66,9 +66,6 @@ int allContoursTestProgramma(int argc, char *argv[])
 	vector<vector<Point>> contours;
 	cout << "Contouren bepalen..." << std::endl;
 	int aantal = allContours(binary16S, contours);  // <<<<*** De opdracht is dus om deze functie te maken ***
-	/*vector<cv::Vec4i> hierachy;
-	cv::findContours(binary16S, contours, hierachy, cv::RETR_FLOODFILL, cv::CHAIN_APPROX_SIMPLE);
-	int aantal = contours.size();*/
 
 	// druk alle punten van alle gevonden contouren af
 	string line;
