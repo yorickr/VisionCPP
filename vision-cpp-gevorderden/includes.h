@@ -14,6 +14,7 @@
 #include <string>
 #include <limits>
 #include <map>
+#include <set>
 
 #include <stdint.h>
 
@@ -27,4 +28,7 @@ using namespace std;
 #if defined(__APPLE__) || defined(__linux__)
 typedef int16_t _int16; // want avans gebruikt types die niet in stdint.h zijn gedefined..
 #endif
+
+#include "avansvisionlib.h"
+
 #endif
