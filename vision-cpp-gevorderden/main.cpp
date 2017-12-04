@@ -1,7 +1,7 @@
 #include "vcpp1.h"
-#include "allContoursTestProgramma.h"
+#include "allContoursTestprogramma.h"
 
 int main(int argc, char **argv) {
-    // return vcpp1_main(argc, argv);
-    return allContoursTestProgramma(argc, argv);
+    return vcpp1_main(argc, argv);
+    // return allContoursTestProgramma(argc, argv);
 }
