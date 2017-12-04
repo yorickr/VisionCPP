@@ -105,6 +105,44 @@ vector<int> find_chain(vector<Point> &contourVec, Point &start) {
     return chain;
 }
 
+int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point>> & bbs) {
+    int i = 0;
+    for (size_t i = 0; i < contours.size(); i++) {
+        vector<Point> v = contours.at(i);
+        vector<Point> boundingPoints;
+
+        int xMax = numeric_limits<int>::min();
+        int xMin = numeric_limits<int>::max();
+
+        int yMax = numeric_limits<int>::min();
+        int yMin = numeric_limits<int>::max();
+
+        for (size_t j = 0; j < v.size(); j++) {
+            Point cur = v.at(j);
+            if (cur.x > xMax) {
+                xMax = cur.x;
+            }
+            if (cur.x < xMin) {
+                xMin = cur.x;
+            }
+            if (cur.y > yMax) {
+                yMax = cur.y;
+            }
+            if (cur.y < yMin) {
+                yMin = cur.y;
+            }
+        }
+
+        boundingPoints.push_back(Point(xMin, xMin));
+        boundingPoints.push_back(Point(xMax, xMax));
+        boundingPoints.push_back(Point(yMin, yMin));
+        boundingPoints.push_back(Point(yMax, yMax));
+        bbs.push_back(boundingPoints);
+        i++;
+    }
+    return i;
+}
+
 double bendingEnergy(Mat binaryImage, vector<Point> &contourVec) {
     // cout << "In function bendingEnergy" << endl;
     // cout << "Size of vec is " << contourVec.size() << endl;
@@ -192,11 +230,16 @@ int vcpp1_main(int argc, char** argv) {
     }
     imshow("Contours", drawing);
 
-    while(1) {
-        if (waitKey(1) == 27) {
-            break;
-        }
+    vector<vector<Point>> bbs;
+    allBoundingBoxes(contours, bbs);
 
+    for (size_t i = 0; i < bbs.size(); i++) {
+        vector<Point> boundingPoints = bbs.at(i);
+        for (size_t j = 0; j < boundingPoints.size(); j++) {
+            cout << boundingPoints.at(j) << endl;
+        }
+        cout << endl;
     }
+
     return 0;
 }
