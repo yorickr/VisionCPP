@@ -63,11 +63,11 @@ bool pixelInOneOfTheContours(vector<vector<Point>> &contours, Point pixel) {
 	if (contours.empty()) return false;
 
 	for (auto const &contour : contours) {			
-		auto result = pointPolygonTest(contour, pixel, false);
-		if (result >= 0) return true;
+		/*auto result = pointPolygonTest(contour, pixel, false);
+		if (result >= 0) return true;*/
 
 		//self-made point in polygon function
-		//if (pixelInContour(contour, pixel)) return true;
+		if (pixelInContour(contour, pixel)) return true;
 	}
 
 	return false;
@@ -141,37 +141,37 @@ Point firstNeighbour1pixel(Mat binaryImage, Point b0, Point c0, Point* c1) {
 	return b0;
 }
 
-/*
-return true, if the pixel is in the contour
-Use the ray-casting algorithm, to see if pixel is in the contour.
-*/
-bool pixelInContour(const vector<Point>& contour, Point pixel)
-{
-	//check if pixel lies on contour
-	if (find(contour.begin(), contour.end(), pixel) != contour.end()) {
-		return true;
-	}
-	
-	// if pixel never cross line, pixel is lies inside the contour
-	bool inside = false;
-	
-	for (int i = 0; i < contour.size(); ++i) {
-
-		//i is the first point and j is the next one.
-		int j = (i + 1) % contour.size();
-
-		Point first = contour[i];
-		Point second = contour[j];
-		
-		//check if the pixel crosses the horizontale line between the y coordinates of first and second point.
-		if ((first.y <= pixel.y) && (second.y > pixel.y) || (second.y <= pixel.y) && (first.y > pixel.y)) {
-			
-			double xCross = (second.x - first.x) * (pixel.y - first.y) / (second.y - first.y) + first.x;
-
-			if (xCross < pixel.x)
-				inside = !inside;
-		}
-	}
-
-	return inside;
-}
+///*
+//return true, if the pixel is in the contour
+//Use the ray-casting algorithm, to see if pixel is in the contour.
+//*/
+//bool pixelInContour(const vector<Point>& contour, Point pixel)
+//{
+//	//check if pixel lies on contour
+//	if (find(contour.begin(), contour.end(), pixel) != contour.end()) {
+//		return true;
+//	}
+//	
+//	// if pixel never cross line, pixel is lies inside the contour
+//	bool inside = false;
+//	
+//	for (int i = 0; i < contour.size(); ++i) {
+//
+//		//i is the first point and j is the next one.
+//		int j = (i + 1) % contour.size();
+//
+//		Point first = contour[i];
+//		Point second = contour[j];
+//		
+//		//check if the pixel crosses the horizontale line between the y coordinates of first and second point.
+//		if ((first.y <= pixel.y) && (second.y > pixel.y) || (second.y <= pixel.y) && (first.y > pixel.y)) {
+//			
+//			double xCross = (second.x - first.x) * (pixel.y - first.y) / (second.y - first.y) + first.x;
+//
+//			if (xCross < pixel.x)
+//				inside = !inside;
+//		}
+//	}
+//
+//	return inside;
+//}

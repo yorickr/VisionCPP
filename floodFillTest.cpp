@@ -1,5 +1,10 @@
 #include "floodFillTest.h"
 #include "floodFill.h"
+#include <chrono>
+#include <stdlib.h>
+#include <stdio.h>
+
+using namespace std::chrono;
 
 int floodFillTest(int argc, char * argv[])
 {
@@ -38,8 +43,9 @@ int floodFillTest(int argc, char * argv[])
 
 	imshow("Original", image);
 	imshow("Binary", bin * 255);
-	cout << "Press enter to go futher" << endl;
 	waitKey(0);
+	cout << "Press enter to go futher" << endl;
+	//waitKey(0);
 
 	vector<vector<Point>> contours;	
 	findContours(bin, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
@@ -56,18 +62,30 @@ int floodFillTest(int argc, char * argv[])
 	}
 
 	cout << "Determine region..." << std::endl;
-	vector<Point> region;
-	int area = enclosedPixels(contours[0], region);
 
-	cout << "Region has a area of: " << area << endl;
+
+	//Self build function
+	vector<Point> region;
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+	int area = enclosedPixels(contours[1], region);
+	high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+	auto duration = duration_cast<milliseconds>(t2 - t1).count();
+	cout << "Region has a area of: " << area << ", In " << duration * 0.001 << " s" << endl;
 
 	// Creeer een witte image
 	IplImage* iplimage = cvCreateImage(cvSize(bin.cols, bin.rows), IPL_DEPTH_8U, 3);
 	Mat regionsImage = cvarrToMat(iplimage);
 	regionsImage = Scalar(255, 255, 255);
 	
-	drawContours(regionsImage, contours, -1, CV_RGB(255, 0, 0));
+	/*drawContours(regionsImage, region, -1, CV_RGB(255, 0, 0));*/
+
+	Vec3b mycolor(255, 0, 0);
+	for (int i = 0; i<region.size(); i++)
+		regionsImage.at<Vec3b>(region[i].y, region[i].x) = mycolor;
 	
+
+	imwrite("C:\\School\\floodfill\\filled.png", regionsImage);
 	imshow("Found Regions: "+to_string(area), regionsImage);
 	waitKey(0);
 
