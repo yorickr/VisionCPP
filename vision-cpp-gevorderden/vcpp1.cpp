@@ -230,10 +230,12 @@ int vcpp1_main(int argc, char** argv) {
 	// Converteren van de ingelezen afbeelding naar een grijswaarde beeld.
 	cvtColor(image, gray_image, CV_BGR2GRAY);
 
-    threshold(gray_image, bin, 150, 255, THRESH_BINARY_INV);
+    int thresh = 170;
+    // Canny(gray_image, bin, thresh, thresh*2, 3);
+    threshold(gray_image, bin, thresh, 255, THRESH_BINARY_INV);
 
     imshow("Original", image);
-    imshow("Binary", bin*255);
+    imshow("Binary", bin);
 
     vector<vector<Point>> contours;
 
@@ -244,10 +246,11 @@ int vcpp1_main(int argc, char** argv) {
         Scalar color = Scalar( rand()%255, rand() % 255, rand() % 255 );
         drawContours( drawing, contours, (int)i, color, 2, 8);
 
-        double f = bendingEnergy(bin, contours.at(i));
-
-        cout << "Bending energy is " << f << endl;
+        // double f = bendingEnergy(bin, contours.at(i));
+        //
+        // cout << "Bending energy is " << f << endl;
     }
+
     imshow("Contours", drawing);
 
     vector<vector<Point>> bbs;
@@ -262,28 +265,52 @@ int vcpp1_main(int argc, char** argv) {
 
     // remove small contours that aren't useful
     cout << "Removing" << endl;
-    vector<int>::iterator it = areas.begin();
 
-    while(it != areas.end()) {
-        if (*it < 10) {
-            it = areas.erase(it);
-        }
-        else {
-            ++it;
-        }
-    }
+    vector<vector<Point>> filtered_bbs;
 
     for (size_t i = 0; i < areas.size(); i++) {
-        cout << "Area of " << i << " is " << areas[i] << endl;
+        int area = areas.at(i);
+        if ((area > 500)) {
+            // add this index.
+            filtered_bbs.push_back(bbs.at(i));
+        }
     }
 
-    // for (size_t i = 0; i < bbs.size(); i++) {
-    //     vector<Point> boundingPoints = bbs.at(i);
-    //     for (size_t j = 0; j < boundingPoints.size(); j++) {
-    //         cout << boundingPoints.at(j) << endl;
-    //     }
-    //     cout << endl;
-    // }
+    // save em.
+    string s = argv[1];
+    string delim = "/";
+    cout << s << endl;
+
+    int start = 0;
+    int end = s.find(delim);
+    while (end != string::npos)
+    {
+        // std::cout << s.substr(start, end - start) << std::endl;
+        start = end + delim.length();
+        end = s.find(delim, start);
+    }
+    string filename = s.substr(start, end);
+    cout << "Filename is " << filename << endl;
+    string name = filename.substr(0, filename.find("."));
+    cout << "Name is " << name << endl;
+
+    Mat area_img = Mat::zeros(bin.size(), CV_8UC3);
+    for (size_t i = 0; i < filtered_bbs.size(); i++) {
+        vector<Point> v = filtered_bbs.at(i);
+        Point p1 = Point(v.at(0).x,v.at(2).y); // xmin and ymin
+        Point p2 = Point(v.at(1).x, v.at(3).y);
+        Scalar color = Scalar( rand()%255, rand() % 255, rand() % 255 );
+        rectangle(area_img, p1, p2, color, 5);
+        cout << p1 << " " << p2 << endl;
+        cout << Rect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y) << endl;
+        cout << "---" << endl;
+        Mat roi(image, Rect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y));
+        imshow("Roi" + to_string(i), roi);
+        imwrite("./images/"+name+to_string(i)+".jpg", roi);
+    }
+    imshow("Bounding boxes", area_img);
+
+
 
     waitKey(0);
     return 0;
