@@ -49,6 +49,26 @@ Point direction_to_point(Point &p) {
     // }
 }
 
+// pass bbs in here to calc contour area.
+int contourArea(const vector<vector<Point>> &bbs, vector<int> &area) {
+    for (size_t i = 0; i < bbs.size(); i++) {
+        vector<Point> v = bbs.at(i);
+        if (v.size() != 4) {
+            // Error
+            cerr << "ContourArea received a vector which is not a bounding box vector.";
+            return -1;
+        }
+        Point xMin = v.at(0);
+        Point xMax = v.at(1);
+        Point yMin = v.at(2);
+        Point yMax = v.at(3);
+
+        area.push_back((xMax.x - xMin.x) * (yMax.y - yMin.y));
+
+    }
+    return 0;
+}
+
 int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point>> & bbs) {
     int i = 0;
     for (size_t i = 0; i < contours.size(); i++) {
@@ -138,7 +158,7 @@ int vcpp1_main(int argc, char** argv) {
 	// Converteren van de ingelezen afbeelding naar een grijswaarde beeld.
 	cvtColor(image, gray_image, CV_BGR2GRAY);
 
-    threshold(gray_image, bin, 240, 255, THRESH_BINARY_INV);
+    threshold(gray_image, bin, 150, 255, THRESH_BINARY_INV);
 
     imshow("Original", image);
     imshow("Binary", bin*255);
@@ -148,7 +168,7 @@ int vcpp1_main(int argc, char** argv) {
     findContours(bin, contours, RETR_TREE, CHAIN_APPROX_SIMPLE); // TODO: change me to our own function.
 
     Mat drawing = Mat::zeros(bin.size(), CV_8UC3);
-    for( size_t i = 2; i< contours.size(); i++ ) {
+    for( size_t i = 0; i< contours.size(); i++ ) {
         Scalar color = Scalar( rand() % 255, rand() % 255, rand() % 255 );
         drawContours( drawing, contours, (int)i, color, 2, 8);
         // break; // TODO: remove me
@@ -158,13 +178,37 @@ int vcpp1_main(int argc, char** argv) {
     vector<vector<Point>> bbs;
     allBoundingBoxes(contours, bbs);
 
-    for (size_t i = 0; i < bbs.size(); i++) {
-        vector<Point> boundingPoints = bbs.at(i);
-        for (size_t j = 0; j < boundingPoints.size(); j++) {
-            cout << boundingPoints.at(j) << endl;
-        }
-        cout << endl;
+    vector<int> areas;
+    contourArea(bbs, areas);
+
+    for (size_t i = 0; i < areas.size(); i++) {
+        cout << "Area of " << i << " is " << areas[i] << endl;
     }
+
+    // remove small contours that aren't useful
+    cout << "Removing" << endl;
+    vector<int>::iterator it = areas.begin();
+
+    while(it != areas.end()) {
+        if (*it < 10) {
+            it = areas.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
+    for (size_t i = 0; i < areas.size(); i++) {
+        cout << "Area of " << i << " is " << areas[i] << endl;
+    }
+
+    // for (size_t i = 0; i < bbs.size(); i++) {
+    //     vector<Point> boundingPoints = bbs.at(i);
+    //     for (size_t j = 0; j < boundingPoints.size(); j++) {
+    //         cout << boundingPoints.at(j) << endl;
+    //     }
+    //     cout << endl;
+    // }
 
     waitKey(0);
     return 0;
