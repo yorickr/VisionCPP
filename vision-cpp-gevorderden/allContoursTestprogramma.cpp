@@ -6,7 +6,7 @@
 //
 // Jan Oostindie, dd 8-11-2016
 //
-#include "allContoursTestProgramma.h"
+#include "allContoursTestprogramma.h"
 
 int allContoursTestProgramma(int argc, char *argv[])
 {

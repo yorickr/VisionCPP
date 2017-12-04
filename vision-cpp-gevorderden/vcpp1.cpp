@@ -20,33 +20,89 @@ bool vec_contains(vector<Point> &vec, Point &p) {
     return false;
 }
 
-Point direction_to_point(Point &p) {
-    // use a map to check all 7 options at once
+pair<int, Point> find_eight_neighbours(vector<Point> &vec, Point &p, int offset, vector<Point> &done) {
+    // P is our starting point.
+    // cout << "Starting from "  << p << endl;
+    for (size_t i = 0; i < 8; i++) {
+        Point to_check;
+        switch(i) {
+            case 0:
+                // check right
+                to_check = Point(p.x + offset   , p.y);
+            break;
+            case 1:
+                // check right top
+                to_check = Point(p.x + offset   , p.y + offset);
+            break;
+            case 2:
+                // check top
+                to_check = Point(p.x            , p.y + offset);
+            break;
+            case 3:
+                // check left top
+                to_check = Point(p.x - offset   , p.y + offset);
+            break;
+            case 4:
+                // check left
+                to_check = Point(p.x - offset   , p.y);
+            break;
+            case 5:
+                // check left bot
+                to_check = Point(p.x - offset   , p.y - offset);
+            break;
+            case 6:
+                // check bot
+                to_check = Point(p.x            , p.y - offset);
+            break;
+            case 7:
+                // check right bot
+                to_check = Point(p.x + offset   , p.y - offset);
+            break;
+            default:
+                cerr << "This should never happen in find_eight_neighbours" << endl;
+                break;
+        }
+        // cout << "Checking " << to_check << endl;
+        if (vec_contains(vec, to_check) && !vec_contains(done, to_check)) {
+            // cout << "This point is in vec" << endl;
+            return make_pair(i, to_check);
+        }
+    }
+    return make_pair(-1, p);
+}
 
-    // int x = p.x;
-    // int y = p.y;
-    // switch(direction) {
-    //     case 0: // check right
-    //         return p
-    //         return Point(x + 1, y    );
-    //     case 1: // check right top
-    //         return Point(x + 1, y + 1);
-    //     case 2: // check top
-    //         return Point(x    , y + 1);
-    //     case 3:
-    //         return Point(x - 1, y + 1);
-    //     case 4:
-    //         return Point(x - 1, y    );
-    //     case 5:
-    //         return Point(x - 1, y - 1);
-    //     case 6:
-    //         return Point(x    , y - 1);
-    //     case 7:
-    //         return Point(x + 1, y - 1);
-    //     default:
-    //         cerr << "Error in direction_to_point" << endl;
-    //         return Point(0,0);
-    // }
+pair<int, Point> find_first_neighbour(vector<Point> &vec, Point &start, vector<Point> &done) {
+    for (size_t i = 1; i <= 10; i++) {
+        pair<int, Point> p = find_eight_neighbours(vec, start, i, done);
+        if (p.second != start) {
+            return p;
+        }
+    }
+    return make_pair(-1, start);
+}
+
+vector<int> find_chain(vector<Point> &contourVec, Point &start) {
+    vector<int> chain;
+    Point *first = &start;
+    Point *current = &start;
+    vector<Point> found;
+    found.push_back(start);
+    bool running = true;
+    while (running) {
+        // cout << "Finding for " << *current << endl;
+        pair<int, Point> p = find_first_neighbour(contourVec, *current, found);
+        // cout << "We have found " << p.second << " with id " << p.first << endl;
+        // cout << "--------------" << endl;
+        found.push_back(p.second);
+        if (p.first == -1) {
+            return chain;
+        }
+        // find next
+        current = &p.second;
+        chain.push_back(p.first);
+    }
+
+    return chain;
 }
 
 // pass bbs in here to calc contour area.
@@ -108,24 +164,40 @@ int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point
 }
 
 double bendingEnergy(Mat binaryImage, vector<Point> &contourVec) {
-    cout << "In function bendingEnergy" << endl;
-
-    for (size_t i = 0; i < contourVec.size(); i++) {
-        Point *p = &contourVec.at(i);
-        // Dereference pointer when we need the value.
-        cout << *p << endl;
-    }
+    // cout << "In function bendingEnergy" << endl;
+    // cout << "Size of vec is " << contourVec.size() << endl;
 
     // find start pixel, so x is closest to 0 and y is also closest to 0
     // note, multiple x'es having the same value can occur.
-    for (size_t i = 0; i < 7; i++) {
-        // check direction.
-        cout << "Direction check " << i << endl;
-        // Point to_check = direction_to_point(i, current);
-        // Vec3b vec = binaryImage.at<Vec3b>(to_check.x , to_check.y);
+    Point *start;
+    start = &contourVec.at(0);
+    for (size_t i = 0; i < contourVec.size(); i++) {
+        Point *p = &contourVec.at(i);
+        if ((p->x <= start->x) && (p->y <= start->y)) {
+            start = p;
+        }
     }
 
-    return 0.0;
+    // cout << "Most top left is " << *start << endl;
+
+    // Assume that a 45 degree bend requires 1 energy, assume that a 90 degree bend requires 2.
+    double energy = 0.0;
+
+    vector<int> chain = find_chain(contourVec, *start);
+    // cout << "Found chain is " << chain.size() << endl;
+    if (chain.size() > 1) {
+        int last = chain[0];
+        for (size_t i = 1; i < chain.size(); i++) {
+            // cout << chain[i];
+            int current = chain[i];
+            // diff of 1 adds 1, diff of 2 adds 2, diff of 3 adds 3
+            energy += abs((current - last));
+            last = current;
+        }
+        // cout << endl;
+    }
+
+    return energy;
 }
 
 int vcpp1_main(int argc, char** argv) {
@@ -169,9 +241,12 @@ int vcpp1_main(int argc, char** argv) {
 
     Mat drawing = Mat::zeros(bin.size(), CV_8UC3);
     for( size_t i = 0; i< contours.size(); i++ ) {
-        Scalar color = Scalar( rand() % 255, rand() % 255, rand() % 255 );
+        Scalar color = Scalar( rand()%255, rand() % 255, rand() % 255 );
         drawContours( drawing, contours, (int)i, color, 2, 8);
-        // break; // TODO: remove me
+
+        double f = bendingEnergy(bin, contours.at(i));
+
+        cout << "Bending energy is " << f << endl;
     }
     imshow("Contours", drawing);
 
