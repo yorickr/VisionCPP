@@ -1,12 +1,12 @@
-// Functionaliteit: Testprogramma voor het testen van de allContours() functie 
-// Zie module Vision C++ voor Gevorderden Opdracht 2 van Fase 1 
+// Functionaliteit: Testprogramma voor het testen van de allContours() functie
+// Zie module Vision C++ voor Gevorderden Opdracht 2 van Fase 1
 // De demo laat met avansvisionlib en OpenCV de contouren zien.
 //
 // De algoritmiek wordt in de eerste workshop toegelicht.
 //
 // Jan Oostindie, dd 8-11-2016
 //
-#include "allContoursTestprogramma.h"
+#include "allContoursTestProgramma.h"
 
 int allContoursTestProgramma(int argc, char *argv[])
 {
@@ -46,7 +46,7 @@ int allContoursTestProgramma(int argc, char *argv[])
 
 	// Grijswaarde afbeelding thresholden
 	Mat binaryImage;
-	
+
 	/** ! Gebruik een region of interest voor de rummikub figuren **/
 	// threshold(imageROI, binaryImage, 65, 1, CV_THRESH_BINARY_INV);
 
@@ -80,7 +80,7 @@ int allContoursTestProgramma(int argc, char *argv[])
 		getline(cin, line);
 		for (int j = 0; j < contours[i].size(); j++) {
 			cout << "(" << contours[i][j].x << "," << contours[i][j].y << ")" << endl;
-		}		
+		}
 	}
 
 	// Creeer een witte image

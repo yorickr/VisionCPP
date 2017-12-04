@@ -49,6 +49,44 @@ Point direction_to_point(Point &p) {
     // }
 }
 
+int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point>> & bbs) {
+    int i = 0;
+    for (size_t i = 0; i < contours.size(); i++) {
+        vector<Point> v = contours.at(i);
+        vector<Point> boundingPoints;
+
+        int xMax = numeric_limits<int>::min();
+        int xMin = numeric_limits<int>::max();
+
+        int yMax = numeric_limits<int>::min();
+        int yMin = numeric_limits<int>::max();
+
+        for (size_t j = 0; j < v.size(); j++) {
+            Point cur = v.at(j);
+            if (cur.x > xMax) {
+                xMax = cur.x;
+            }
+            if (cur.x < xMin) {
+                xMin = cur.x;
+            }
+            if (cur.y > yMax) {
+                yMax = cur.y;
+            }
+            if (cur.y < yMin) {
+                yMin = cur.y;
+            }
+        }
+
+        boundingPoints.push_back(Point(xMin, xMin));
+        boundingPoints.push_back(Point(xMax, xMax));
+        boundingPoints.push_back(Point(yMin, yMin));
+        boundingPoints.push_back(Point(yMax, yMax));
+        bbs.push_back(boundingPoints);
+        i++;
+    }
+    return i;
+}
+
 double bendingEnergy(Mat binaryImage, vector<Point> &contourVec) {
     cout << "In function bendingEnergy" << endl;
 
@@ -111,15 +149,22 @@ int vcpp1_main(int argc, char** argv) {
 
     Mat drawing = Mat::zeros(bin.size(), CV_8UC3);
     for( size_t i = 2; i< contours.size(); i++ ) {
-        Scalar color = Scalar( rand()%255, rand() % 255, rand() % 255 );
+        Scalar color = Scalar( rand() % 255, rand() % 255, rand() % 255 );
         drawContours( drawing, contours, (int)i, color, 2, 8);
         // break; // TODO: remove me
     }
     imshow("Contours", drawing);
 
-    double f = bendingEnergy(bin, contours.at(2));
+    vector<vector<Point>> bbs;
+    allBoundingBoxes(contours, bbs);
 
-    cout << "Bending energy is " << f << endl;
+    for (size_t i = 0; i < bbs.size(); i++) {
+        vector<Point> boundingPoints = bbs.at(i);
+        for (size_t j = 0; j < boundingPoints.size(); j++) {
+            cout << boundingPoints.at(j) << endl;
+        }
+        cout << endl;
+    }
 
     waitKey(0);
     return 0;
