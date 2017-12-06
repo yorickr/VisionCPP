@@ -1,11 +1,11 @@
 #ifndef ALLCONTOURSTESTPROGRAMMA
 #define ALLCONTOURSTESTPROGRAMMA
 
-#include "opencv2/imgproc/imgproc.hpp" 
+#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include <iostream>
 #include <string>
-#include "avansvisionlib\avansvisionlib.h"
+#include "avansvisionlib.h"
 
 #include "MooreBoundaryTracking.h"
 
