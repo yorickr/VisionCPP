@@ -48,7 +48,7 @@ int floodFillTest(int argc, char * argv[])
 	//waitKey(0);
 
 	vector<vector<Point>> contours;
-	findContours(bin, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+	findContours(bin, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
 	/*for (auto const& contour : contours) {
 		cout << "Determine region..." << std::endl;
@@ -63,11 +63,18 @@ int floodFillTest(int argc, char * argv[])
 
 	cout << "Determine region..." << std::endl;
 
+	Mat drawing = Mat::zeros(bin.size(), CV_8UC3);
+	Scalar color = Scalar(rand() % 255, rand() % 255, rand() % 255);
+	drawContours(drawing, contours, 0, color, 1, 8);
+	imshow("Contour", drawing);
+	imwrite("C:\\School\\floodfill\\flood_fill_test_contour.png", drawing);
+	waitKey(0);
+
 
 	//Self build function
 	vector<Point> region;
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
-	int area = enclosedPixels(contours[1], region);
+	int area = enclosedPixels(contours[0], region);
 	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
 	auto duration = duration_cast<milliseconds>(t2 - t1).count();

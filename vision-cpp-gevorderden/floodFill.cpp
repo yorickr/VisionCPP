@@ -57,21 +57,25 @@ int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixel
 	}
 
 	//make the contour water proof.
+	cout << "Building boundary" << endl;
 	makeGridDoubleBoundary(grid, boundaryBoxContour);
+	cout << "Boundary build" << endl;
 
-	Point startPoint(3, 3);
+	Point startPoint;
 
 	//define a startpoint
 	bool loop = true;
 	bool pointInC = false;
 	bool pointInBoundary = true;
+
+	cout << "searching startPoint" << endl;
 	while (loop) {
-		startPoint.x = rand() % (mmx.second->x - mmx.first->x) + mmx.first->x;
-		startPoint.y = rand() % (mmy.second->y - mmy.first->y) + mmy.first->y;
+		startPoint.x = rand() % width;
+		startPoint.y = rand() % height;
 
 		pointInC = pixelInContour(boundaryBoxContour, startPoint);
 		pointInBoundary = elementInVector(boundaryBoxContour, startPoint);
-		cout << "point In Boundary" << endl;
+		//cout << "point In Boundary" << endl;
 		loop = !(pointInC && !pointInBoundary);
 	}
 
@@ -118,7 +122,7 @@ void floodFillStep(vector<vector<int>> &grid, Point startPoint, int stepFromStar
 				}
 			}
 		}
-		cout << foundPoints.size() << endl;
+		//cout << foundPoints.size() << endl;
 
 		nextStepPoints.clear();
 	} while (foundPoints.size() > 0);
