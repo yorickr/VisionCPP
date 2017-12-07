@@ -109,26 +109,28 @@ int vcpp3c_main(int argc, char ** argv)
 
 	cout << "Region of Interest size: " << roiSize << endl;
 
+	roiSize.width += 1;
+	roiSize.height += 1;
+
 	for (int i = 0; i < regions.size(); i++) {
 		auto region = regions[i];
 		auto mmx = std::minmax_element(region.begin(), region.end(), [](const cv::Point& lhs, const cv::Point& rhs) {return lhs.x < rhs.x; });
 		auto mmy = std::minmax_element(region.begin(), region.end(), [](const cv::Point& lhs, const cv::Point& rhs) {return lhs.y < rhs.y; });
-		
-		Mat roi(image, Rect(
-			mmx.first->x,
-			mmy.first->y,
-			mmx.second->x - mmx.first->x,
-			mmy.second->y - mmy.first->y
-		));
+		//Object plaatje met vaste breedte en hoogte
 		Mat objectRoi = Mat::zeros(roiSize, CV_8UC3);
-		roi.copyTo(objectRoi(
-			Rect(
-				objectRoi.cols / 2 - roi.cols / 2,
-				objectRoi.rows / 2 - roi.rows / 2,
-				roi.cols,
-				roi.rows
-			)
-		));
+				
+		for (auto const &regionPixel : region) {
+			Mat pixel(image, Rect(regionPixel.x, regionPixel.y, 1, 1));
+			Rect objectRoiPos(
+				(regionPixel.x - mmx.first->x),
+				(regionPixel.y - mmy.first->y),
+				1,
+				1
+			);
+
+			//cout << "Last object pos: " << objectRoiPos << ", region: " << i << endl;
+			pixel.copyTo(objectRoi(objectRoiPos));
+		}
 
 		imshow(name + to_string(i), objectRoi);
 		imwrite("C:\\School\\floodfill\\" + name + "_" + to_string(i) + ".jpg", objectRoi);
