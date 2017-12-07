@@ -78,7 +78,7 @@ int vcpp3c_main(int argc, char ** argv)
 		Scalar color = Scalar(rand() % 255, rand() % 255, rand() % 255);
 		drawContours(drawing, filteredContours, (int)i, color, 1, 8);
 		imshow(name + to_string(i) + "_contour", drawing);
-		imwrite("C:\\School\\floodfill\\" + name + "_" + to_string(i) + "_contour.jpg", drawing);
+		imwrite("C:\\School\\bladeren\\" + name + "_contour_" + to_string(i) + ".jpg", drawing);
 	}	
 	waitKey(0);
 
@@ -118,22 +118,23 @@ int vcpp3c_main(int argc, char ** argv)
 		auto mmy = std::minmax_element(region.begin(), region.end(), [](const cv::Point& lhs, const cv::Point& rhs) {return lhs.y < rhs.y; });
 		//Object plaatje met vaste breedte en hoogte
 		Mat objectRoi = Mat::zeros(roiSize, CV_8UC3);
+		int leftOverWidthTillBorder = objectRoi.cols - (mmx.second->x - mmx.first->x);
+		int leftOverHeightTillBorder = objectRoi.rows - (mmy.second->y - mmy.first->y);
 				
 		for (auto const &regionPixel : region) {
 			Mat pixel(image, Rect(regionPixel.x, regionPixel.y, 1, 1));
 			Rect objectRoiPos(
-				(regionPixel.x - mmx.first->x),
-				(regionPixel.y - mmy.first->y),
+				(regionPixel.x - mmx.first->x) + (leftOverWidthTillBorder / 2),
+				(regionPixel.y - mmy.first->y) + (leftOverHeightTillBorder / 2),
 				1,
 				1
 			);
 
-			//cout << "Last object pos: " << objectRoiPos << ", region: " << i << endl;
 			pixel.copyTo(objectRoi(objectRoiPos));
 		}
 
 		imshow(name + to_string(i), objectRoi);
-		imwrite("C:\\School\\floodfill\\" + name + "_" + to_string(i) + ".jpg", objectRoi);
+		imwrite("C:\\School\\bladeren\\" + name + "_" + to_string(i) + ".jpg", objectRoi);
 	}
 	waitKey(0);
 }
