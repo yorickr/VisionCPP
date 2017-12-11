@@ -73,13 +73,15 @@ int vcpp3c_main(int argc, char ** argv)
 
 	cout << "Drawing contours" << endl;
 		
+	Mat drawing = Mat::zeros(bin.size(), CV_8UC3);
 	for (size_t i = 0; i< filteredContours.size(); i++) {
-		Mat drawing = Mat::zeros(bin.size(), CV_8UC3);
+		
 		Scalar color = Scalar(rand() % 255, rand() % 255, rand() % 255);
-		drawContours(drawing, filteredContours, (int)i, color, 1, 8);
-		imshow(name + to_string(i) + "_contour", drawing);
-		imwrite("C:\\School\\bladeren\\" + name + "_contour_" + to_string(i) + ".jpg", drawing);
+		drawContours(drawing, filteredContours, (int)i, color, 1, 8);		
 	}	
+
+	//imshow(name + "_contouren", drawing);
+	imwrite("C:\\School\\bladeren\\" + name + "_contouren.jpg", drawing);
 	waitKey(0);
 
 	vector<vector<Point>> regions;

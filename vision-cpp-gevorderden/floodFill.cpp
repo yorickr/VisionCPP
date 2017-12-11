@@ -12,7 +12,7 @@ bool less_by_y(const cv::Point& lhs, const cv::Point& rhs)
 	return lhs.y < rhs.y;
 }
 
-void floodFillStep(vector<vector<int>> &grid, Point startPoint, int stepFromStartPoint);
+void floodFill(vector<vector<int>> &grid, Point startPoint, int stepFromStartPoint);
 void makeGridDoubleBoundary(vector<vector<int>> &grid, const vector<Point> &contour);
 void changeCellValue(vector<vector<int>>& grid, Point &cell, int cellValue);
 int getCellValue(const vector<vector<int>>& grid, const Point &cell);
@@ -83,7 +83,7 @@ int enclosedPixels(const vector<Point> & contourVec, vector<Point> & regionPixel
 
 	grid[startPoint.y][startPoint.x] = 0;
 
-	floodFillStep(grid, startPoint, 1);
+	floodFill(grid, startPoint, 1);
 
 	for (int r = 0; r < grid.size(); r++) {
 		for (int c = 0; c < grid[r].size(); c++) {
@@ -103,7 +103,7 @@ vector<Point> directions = { {-1, 0}, {-1, -1}, {0,-1}, {1,-1}, {1,0}, {1,1}, {0
 	startPoints lies i the contour.
 
 */
-void floodFillStep(vector<vector<int>> &grid, Point startPoint, int stepFromStartPoint) {
+void floodFill(vector<vector<int>> &grid, Point startPoint, int stepFromStartPoint) {
 	vector<Point> foundPoints = { startPoint }, nextStepPoints;
 
 	do {
@@ -128,8 +128,6 @@ void floodFillStep(vector<vector<int>> &grid, Point startPoint, int stepFromStar
 	} while (foundPoints.size() > 0);
 }
 
-float angle = 90 / 180.0 * M_PI;
-
 void changeCellValue(vector<vector<int>>& grid, Point &cell, int cellValue) {
 	if (!cellFitInGrid(grid, cell)) return;
 	grid[cell.y][cell.x] = cellValue;
@@ -150,6 +148,7 @@ bool cellFitInGrid(const vector<vector<int>>& grid, const Point & cell)
 
 void makeGridDoubleBoundary(vector<vector<int>>& grid, const vector<Point>& contour)
 {
+	float angle = 90 / 180.0 * M_PI;
 	Point translation, newBoundaryTranslation, newBoundary1, newBoundary2;
 	int j;
 	int x = 0, y = 0;

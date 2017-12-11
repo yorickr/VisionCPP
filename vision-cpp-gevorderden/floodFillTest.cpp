@@ -67,7 +67,7 @@ int floodFillTest(int argc, char * argv[])
 	Scalar color = Scalar(rand() % 255, rand() % 255, rand() % 255);
 	drawContours(drawing, contours, 0, color, 1, 8);
 	imshow("Contour", drawing);
-	imwrite("C:\\School\\floodfill\\flood_fill_test_contour.png", drawing);
+	//imwrite("C:\\School\\floodfill\\flood_fill_test_contour.png", drawing);
 	waitKey(0);
 
 

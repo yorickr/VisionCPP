@@ -164,7 +164,7 @@ int allBoundingBoxes(const vector<vector<Point>> & contours, vector<vector<Point
 }
 
 double bendingEnergy(Mat binaryImage, vector<Point> &contourVec) {
-    // cout << "In function bendingEnergy" << endl;
+    // cout << "In function be	ndingEnergy" << endl;
     // cout << "Size of vec is " << contourVec.size() << endl;
 
     // find start pixel, so x is closest to 0 and y is also closest to 0
