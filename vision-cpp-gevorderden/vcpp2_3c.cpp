@@ -1,9 +1,9 @@
-#include "vcpp3c.h"
+#include "vcpp2_3c.h"
 #include "vcpp1.h"
 #include "floodFill.h"
 #include "../inleiding-vision-cpp/includes.h"
 
-int vcpp3c_main(int argc, char ** argv)
+int vcpp2_3c_main(int argc, char ** argv)
 {
 	srand(time(nullptr));
 	// Controle of er een argument aan het programma is meegegeven.

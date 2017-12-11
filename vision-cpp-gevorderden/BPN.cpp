@@ -7,6 +7,7 @@
 #include <opencv/cv.h>
 #include <iostream>
 #include <string>
+#include <iomanip>      // std::setw
 #include "avansvisionlib20.h" // versie 2.0 (!)
 
 using namespace cv;
